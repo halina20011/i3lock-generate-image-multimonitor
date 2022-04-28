@@ -116,5 +116,5 @@ convert $img -scale ${w2}x${h2}\! biggerImg.png
 
 convert +append smallerImg.png biggerImg.png lockImg.png
 
-# rm smallerImg.png 
-# rm biggerImg.png
+rm smallerImg.png 
+rm biggerImg.png
