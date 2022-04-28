@@ -112,9 +112,9 @@ echo "Resizing image to: ${w1}x${h1}"
 convert $img -scale ${w1}^x${h1}^ -gravity North -extent ${w1}x${h2} smallerImg.png
 
 echo "Resizing image to: ${w2}x${h2}"
-convert $img -scale ${w2}^x${h2}^ biggerImg.png
+convert $img -scale ${w2}x${h2}\! biggerImg.png
 
 convert +append smallerImg.png biggerImg.png lockImg.png
 
-rm smallerImg.png 
-rm biggerImg.png
+# rm smallerImg.png 
+# rm biggerImg.png
