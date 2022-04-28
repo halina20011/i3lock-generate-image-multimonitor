@@ -1,0 +1,120 @@
+#!/bin/bash
+#yay -S imagemagick
+# You can run script two ways:
+#     1. only provide path to image:
+#       $ bash generate $HOME/wallpapers/archLinuxText.png 1366 768 1920 1080
+#     2. Provide <image path> <width of fisrt monitor> <height of fisrt monitor> <width of second monitor> <height of second monitor>
+#       $ bash generate $HOME/wallpapers/archLinuxText.png 1366 768 1920 1080 
+#bash generate $HOME/wallpapers/archLinuxText.png 1366 768 1920 1080
+
+# Get all current sizes of monitors
+#   Example:
+#   1366x768      60.04*+
+#   1920x1080     60.00*+  50.00    59.94
+xrandr=($(xrandr | grep "*"))
+
+echo "xrandr output list: ${xrandr[@]}"
+echo "xrandr output list: ${#xrandr[@]}"
+
+listOfDimensions=()
+
+for (( i = 0; i < ${#xrandr[@]}; i++ )); do
+  if [[ ${xrandr[i]} == *x* ]]; then #If String contains "x" (1366x768)
+
+    string=${xrandr[i]}
+    end=${#string}
+
+    for (( x = 0; x < $end; x++ )); do
+      _letter=${string:x:1} # 1366x768 {string:position:length}
+      if [[ $_letter == "x" ]]; then          #x = 4 (index of "x")
+        _w=${string:0:x}                      #_w={str:0:4} 
+        _h=${string:$((x + 1)):$((end - x))}  #_h={str:4 + 1:8 - 4}
+	      dim=($_w $_h)                         
+	      listOfDimensions+=(${dim[@]})
+        echo "W:H $_w:$_h"
+      fi
+    done
+  fi
+done
+
+echo "Number of dimensions arguments: ${#listOfDimensions[@]}"
+echo ${listOfDimensions[@]}
+
+#The total number of arguments passed to the script.
+arguments=$#
+
+echo "Number of script arguments: $arguments"
+
+w1=0
+h1=0
+
+w2=0
+h2=0
+
+img=$1
+
+if [[ ${#listOfDimensions[@]} == 4 ]]; then
+  w1=${listOfDimensions[0]}
+  h1=${listOfDimensions[1]}
+
+  w2=${listOfDimensions[2]}
+  h2=${listOfDimensions[3]}
+
+elif [[ $arguments == 5 ]]; then
+  w1=$2
+  h1=$3
+
+  w2=$4
+  h2=$5
+
+elif [[ $arguments != 5 ]]; then
+	echo "Error: Wrong number of argumens."
+	exit -1
+fi
+
+echo "Number of arguments $arguments"
+echo "Img path: $img"
+
+echo "W: $w1"
+echo "H: $h1"
+
+echo "W: $w2"
+echo "H: $h2"
+
+if [ -f $img ]; then
+  if [[ $img != *.png ]]; then
+# if [[ ${img: -4} != ".png" ]]; then
+    echo "Error: File is not png type."
+    exit -1
+  fi
+else
+ echo "Error: $File not exist."
+ exit -1
+fi
+
+#Generate first image
+bigger=""
+
+if [[ $w1 < $w2 ]]; then
+  echo "Second display is bigger then second."
+  bigger=second
+
+else
+  echo "First display is bigger then second."
+  bigger=first
+
+fi
+
+echo "Bigger monitor is: ${bigger}"
+
+# Scale image and to match smaller display
+echo "Resizing image to: ${w1}x${h1}"
+convert $img -scale ${w1}^x${h1}^ -gravity North -extent ${w1}x${h2} smallerImg.png
+
+echo "Resizing image to: ${w2}x${h2}"
+convert $img -scale ${w2}^x${h2}^ biggerImg.png
+
+convert +append smallerImg.png biggerImg.png lockImg.png
+
+rm smallerImg.png 
+rm biggerImg.png
