@@ -15,14 +15,13 @@
     </div>
 </div>
 
+<h2>Installation: </h2>
+install: "imagemagick"
+
+```yay -S imagemagick```
+
 <h2> How to use it: </h2>
 
-<p>First you need to install</p> 
-```imagemagick```
-
-```
-$yay -S imagemagick
-```
 
 You can run script two ways:
 
