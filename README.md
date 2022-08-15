@@ -6,7 +6,7 @@
         <a href="https://www.youtube.com/channel/UCG0h6r6T1joRASO29JV9qMQ">
             <img src="https://img.shields.io/badge/YouTube-red?style=for-the-badge&logo=youtube&logoColor=white" alt="Youtube Badge"/>
         </a>
-        <a href="https://halina-website.firebaseapp.com/">
+        <a href="https://halina20011.github.io/">
             <img src="https://img.shields.io/badge/Website-lightgrey?style=for-the-badge" alt="Website"/>
         </a>
         <a href="https://www.instagram.com/mario.durakovic/">
