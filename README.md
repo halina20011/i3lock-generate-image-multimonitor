@@ -16,7 +16,7 @@
 </div>
 
 <h2>Install these dependencies: </h2>
-&ensp;- imagemagick
+- imagemagick
 &nbsp;```yay -S imagemagick```
 
 <h2> How to use it: </h2>
