@@ -1,5 +1,8 @@
 #!/bin/bash
-#yay -S imagemagick
+
+# To run this script you will need to first need to install all required dependencies.
+# yay -S imagemagick
+
 # You can run script two ways:
 #     1. only provide path to image:
 #       $ bash generate $HOME/wallpapers/archLinuxText.png 1366 768 1920 1080

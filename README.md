@@ -15,13 +15,12 @@
     </div>
 </div>
 
-<h2>Installation: </h2>
-install: "imagemagick"
+<h2>Install these dependencies: </h2>
+ - imagemagick
 
 ```yay -S imagemagick```
 
 <h2> How to use it: </h2>
-
 
 You can run script two ways:
 
@@ -29,5 +28,5 @@ You can run script two ways:
         ```$ bash generate ./archWallpaper.png```
 
 
-2. Provide [image path] [width of fisrt monitor] [height of fisrt monitor] [width of second monitor] [height of second monitor]
+2. Provide [image path] [width of first monitor] [height of first monitor] [width of second monitor] [height of second monitor]
     ``` $ bash generate ./archWallpaper.png 1366 768 1920 1080```
