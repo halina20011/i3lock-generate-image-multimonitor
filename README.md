@@ -16,8 +16,8 @@
 </div>
 
 <h2>Install these dependencies: </h2>
+
 - imagemagick
-&nbsp;```yay -S imagemagick```
 
 <h2> How to use it: </h2>
 
