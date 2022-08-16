@@ -22,22 +22,21 @@ echo "xrandr output list: ${#xrandr[@]}"
 listOfDimensions=()
 
 for (( i = 0; i < ${#xrandr[@]}; i++ )); do
-  if [[ ${xrandr[i]} == *x* ]]; then #If String contains "x" (1366x768)
+    if [[ ${xrandr[i]} == *x* ]]; then #If String contains "x" (1366x768)
+        string=${xrandr[i]}
+        end=${#string}
 
-    string=${xrandr[i]}
-    end=${#string}
-
-    for (( x = 0; x < $end; x++ )); do
-      _letter=${string:x:1} # 1366x768 {string:position:length}
-      if [[ $_letter == "x" ]]; then          #x = 4 (index of "x")
-        _w=${string:0:x}                      #_w={str:0:4} 
-        _h=${string:$((x + 1)):$((end - x))}  #_h={str:4 + 1:8 - 4}
-	      dim=($_w $_h)                         
-	      listOfDimensions+=(${dim[@]})
-        echo "W:H $_w:$_h"
-      fi
-    done
-  fi
+        for (( x = 0; x < $end; x++ )); do
+            _letter=${string:x:1} # 1366x768 {string:position:length}
+            if [[ $_letter == "x" ]]; then          #x = 4 (index of "x")
+                _w=${string:0:x}                      #_w={str:0:4} 
+                _h=${string:$((x + 1)):$((end - x))}  #_h={str:4 + 1:8 - 4}
+                dim=($_w $_h)                         
+                listOfDimensions+=(${dim[@]})
+                echo "W:H $_w:$_h"
+            fi
+        done
+    fi
 done
 
 echo "Number of dimensions arguments: ${#listOfDimensions[@]}"
@@ -57,22 +56,20 @@ h2=0
 img=$1
 
 if [[ ${#listOfDimensions[@]} == 4 ]]; then
-  w1=${listOfDimensions[0]}
-  h1=${listOfDimensions[1]}
+    w1=${listOfDimensions[0]}
+    h1=${listOfDimensions[1]}
 
-  w2=${listOfDimensions[2]}
-  h2=${listOfDimensions[3]}
-
+    w2=${listOfDimensions[2]}
+    h2=${listOfDimensions[3]}
 elif [[ $arguments == 5 ]]; then
-  w1=$2
-  h1=$3
+    w1=$2
+    h1=$3
 
-  w2=$4
-  h2=$5
-
+    w2=$4
+    h2=$5
 elif [[ $arguments != 5 ]]; then
-	echo "Error: Wrong number of argumens."
-	exit -1
+    echo "Error: Wrong number of argumens."
+    exit -1
 fi
 
 echo "Number of arguments $arguments"
@@ -85,27 +82,25 @@ echo "W: $w2"
 echo "H: $h2"
 
 if [ -f $img ]; then
-  if [[ $img != *.png ]]; then
-# if [[ ${img: -4} != ".png" ]]; then
-    echo "Error: File is not png type."
-    exit -1
-  fi
+    if [[ $img != *.png ]]; then
+    # if [[ ${img: -4} != ".png" ]]; then
+        echo "Error: File is not png type."
+        exit -1
+    fi
 else
- echo "Error: $File not exist."
- exit -1
+    echo "Error: $File not exist."
+    exit -1
 fi
 
 #Generate first image
 bigger=""
 
 if [[ $w1 < $w2 ]]; then
-  echo "Second display is bigger then second."
-  bigger=second
-
+    echo "Second display is bigger then second."
+    bigger=second
 else
-  echo "First display is bigger then second."
-  bigger=first
-
+    echo "First display is bigger then second."
+    bigger=first
 fi
 
 echo "Bigger monitor is: ${bigger}"
@@ -118,6 +113,8 @@ echo "Resizing image to: ${w2}x${h2}"
 convert $img -scale ${w2}x${h2}\! biggerImg.png
 
 convert +append smallerImg.png biggerImg.png lockImg.png
+
+echo "Image was generated successfully."
 
 rm smallerImg.png 
 rm biggerImg.png
