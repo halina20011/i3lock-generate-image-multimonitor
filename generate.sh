@@ -1,14 +1,21 @@
-#!/bin/bash
-
+#!/bin/sh
+#
+# Written by halina20011
+#
 # To run this script you will need to first need to install all required dependencies.
 # yay -S imagemagick
 
-# You can run script two ways:
-#     1. only provide path to image:
-#       $ bash generate $HOME/wallpapers/archLinuxText.png 1366 768 1920 1080
-#     2. Provide <image path> <width of fisrt monitor> <height of fisrt monitor> <width of second monitor> <height of second monitor>
-#       $ bash generate $HOME/wallpapers/archLinuxText.png 1366 768 1920 1080 
-#bash generate $HOME/wallpapers/archLinuxText.png 1366 768 1920 1080
+## How to use it
+# Monitor sizes are passed from left to rigth
+#
+# You can run script two ways: </br>
+# 1. Automatic (only when you have two monitors) </br>
+#         ```$ ./generate.sh [image1]```
+#         ```$ ./generate.sh [image1] [image2]```
+#
+# 2. Manual ([image]/[image1] [image2]) [width of first monitor] [height of first monitor] [width of second monitor] [height of second monitor] </br>
+#     ``` $ generate.sh [image] [w1] [h1] [w2] [h2]```
+#     ``` $ generate.sh [image1] [image2] [w1] [h1] [w2] [h2]```
 
 # Get all current sizes of monitors
 #   Example:
@@ -53,68 +60,118 @@ h1=0
 w2=0
 h2=0
 
-img=$1
+img1=$(realpath $1)
+img2=""
 
-if [[ ${#listOfDimensions[@]} == 4 ]]; then
-    w1=${listOfDimensions[0]}
-    h1=${listOfDimensions[1]}
+twoImages=0
 
-    w2=${listOfDimensions[2]}
-    h2=${listOfDimensions[3]}
-elif [[ $arguments == 5 ]]; then
+echo "Number of arguments: $arguments"
+
+if [[ $arguments == 5 ]]; then
     w1=$2
     h1=$3
 
     w2=$4
     h2=$5
+elif [[ $arguments == 6 ]]; then
+    img2=$(realpath $2)
+    twoImages=1
+    
+    w1=$3
+    h1=$4
+
+    w2=$5
+    h2=$6
+elif [[ ${#listOfDimensions[@]} == 4 ]]; then
+    w1=${listOfDimensions[0]}
+    h1=${listOfDimensions[1]}
+
+    w2=${listOfDimensions[2]}
+    h2=${listOfDimensions[3]}
 elif [[ $arguments != 5 ]]; then
     echo "Error: Wrong number of argumens."
     exit -1
 fi
 
-echo "Number of arguments $arguments"
-echo "Img path: $img"
-
-echo "W: $w1"
-echo "H: $h1"
-
-echo "W: $w2"
-echo "H: $h2"
-
-if [ -f $img ]; then
-    if [[ $img != *.png ]]; then
-    # if [[ ${img: -4} != ".png" ]]; then
-        echo "Error: File is not png type."
+function checkImage () {
+    echo Image $1
+    img=$1
+    if [ ! -f $img ]; then
+        echo "Error: $img doesn't exist"
         exit -1
     fi
-else
-    echo "Error: $File not exist."
-    exit -1
+}
+
+checkImage $img1
+echo "Img1 path: $img1"
+
+if [ $twoImages == 1 ]; then 
+    echo Two images: $twoImagesa
+    checkImage $img2
+    echo "Img2 path: $img2"
 fi
 
-#Generate first image
+
+echo "Size: [${w1}x${h1}] [${w2}x${h2}]"
+
+# Generate first image
 bigger=""
+firstImage=$img1
+secondImage=$img1
 
-if [[ $w1 < $w2 ]]; then
-    echo "Second display is bigger then second."
+height=$h1
+
+if [[ $h1 -lt $h2 ]]; then
+    height=$h2
+    echo "Second display is bigger then the first one"
+
     bigger=second
-else
-    echo "First display is bigger then second."
+
+    if [ $twoImages == 1 ]; then 
+        secondImage=$img1
+        firstImage=$img2
+    fi
+elif [ $h2 -lt $h1 ]; then
+    echo "First display is bigger then the second one"
+
     bigger=first
+
+    if [ $twoImages == 1 ]; then 
+        firstImage=$img1
+        secondImage=$img2
+    fi
+else
+    echo "Displays are same in height"
+    bigger=none
+    if [ $twoImages == 1 ]; then 
+        secondImage=$img1
+        firstImage=$img2
+    fi
 fi
 
-echo "Bigger monitor is: ${bigger}"
+echo "Bigger monitor is: ${bigger} with height ${height}"
 
-# Scale image and to match smaller display
-echo "Resizing image to: ${w1}x${h1}"
-convert $img -scale ${w1}^x${h1}^ -gravity North -extent ${w1}x${h2} smallerImg.png
+# Extend smaller image to match bigger display
+if [ $bigger == second ]; then
+    echo "Resizing image for first monitor to: ${w1}x${height}"
+    convert $firstImage -scale ${w1}^x${h1}^ -gravity North -extent ${w1}x${height} monitor1.png
 
-echo "Resizing image to: ${w2}x${h2}"
-convert $img -scale ${w2}x${h2}\! biggerImg.png
+    echo "Resizing image for second monitor to: ${w2}x${height}"
+    convert $secondImage -scale ${w2}x${height}\! monitor2.png
+elif [ $bigger == first ]; then
+    echo "Resizing image for first monitor to: ${w1}x${height}"
+    convert $firstImage -scale ${w1}x${height}\! monitor1.png
 
-convert +append smallerImg.png biggerImg.png lockImg.png
+    echo "Resizing image for second monitor to: ${w2}x${height}"
+    convert $secondImage -scale ${w2}^x${h2}^ -gravity North -extent ${w2}x${height} monitor2.png
+else
+    convert $firstImage -scale ${w1}x${height}\! monitor1.png
+    convert $secondImage -scale ${w2}x${height}\! monitor2.png
+fi
 
-echo "Image was generated successfully."
+convert +append monitor1.png monitor2.png lockImg.png
 
-rm smallerImg.png 
-rm biggerImg.png
+echo "Image was generated successfully"
+
+rm monitor1.png 
+rm monitor2.png
